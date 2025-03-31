@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgres:14.2
+    restart: always
+    environment:
+      POSTGRES_USER: springapi_user
+      POSTGRES_PASSWORD: springapi_pass
+      POSTGRES_DB: springapi
+    ports:
+      - '5432:5432'
+    volumes:
+      - db_data:/var/lib/postgresql/data/
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  minio:
+    image: minio/minio:latest
+    restart: always
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    environment:
+      MINIO_ACCESS_KEY: minio_admin
+      MINIO_SECRET_KEY: minio_secret
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ':9001'
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - '8080:8080'
+    depends_on:
+      - db
+      - minio
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/springapi
+      SPRING_DATASOURCE_USERNAME: springapi_user
+      SPRING_DATASOURCE_PASSWORD: springapi_pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      MINIO_URL: http://minio:9000
+      MINIO_ACCESS_KEY: minio_admin
+      MINIO_SECRET_KEY: minio_secret
+      MINIO_BUCKET_NAME: fotos
+      JWT_SECRET: supersecretkeyspringapi12456a1118c96d67df4cfa09cf087caca13067f65
+      JWT_EXPIRATION: 300000 # 5 minutos
+      JWT_REFRESH_EXPIRATION: 604800000 # 7 dias
+      API_AUTH_USERNAME: "ADMIN_USER" # usuario local para uso de api
+      API_AUTH_PASSWORD: "PASSWORD" # senha do usuario local
+volumes:
+  db_data:
+  minio_data:
