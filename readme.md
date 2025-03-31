@@ -8,4 +8,4 @@ docker compose up
 ```
 
 Acessar a página: `http://localhost:8080/swagger-ui/index.html`  
-Para testar sem problemas de CORS colar o script js no console: `endToEndTestScript.js`  
+Para testar sem problemas de CORS colar o conteúdo do arquivo `endToEndTestScript.js` no console.
