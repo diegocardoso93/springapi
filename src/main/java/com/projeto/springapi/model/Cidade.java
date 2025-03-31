@@ -11,7 +11,7 @@ public class Cidade {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cid_id")
     private Long cidId;
-    @Column(name = "nome")
+    @Column(name = "cid_nome")
     private String nome;
     @Column(name = "cid_uf")
     private String cidUf;

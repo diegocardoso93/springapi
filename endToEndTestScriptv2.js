@@ -1,3 +1,4 @@
+
 // Executar no console da página http://localhost:8080/swagger-ui/index.html
 
 const BASE_URL = 'http://localhost:8080';
@@ -22,7 +23,8 @@ const TEST_DATA = {
     sexo: 'F',
     mae: 'Mae Temporario 1',
     pai: 'Pai Temporario 1'
-  }
+  },
+  avatarUrl: 'https://img.freepik.com/free-psd/3d-rendering-hair-style-avatar-design_23-2151869121.jpg' // Simplified URL
 };
 
 class ApiClient {
@@ -44,7 +46,7 @@ class ApiClient {
 
     const data = await response.json();
     this.token = data.token;
-    console.log('Logged in successfully. Token:', data.token);
+    console.log('Logado com sucesso. Token:', data.token);
     return data;
   }
 
@@ -73,6 +75,39 @@ class ApiClient {
   post(url, data) {
     return this.request(url, 'POST', data);
   }
+
+  async postFormData(url, formData) {
+    const headers = {
+      ...(this.token && { Authorization: `Bearer ${this.token}` })
+    };
+
+    const response = await fetch(`${this.baseUrl}${url}`, {
+      method: 'POST',
+      headers,
+      body: formData
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`Upload failed: ${JSON.stringify(error)}`);
+    }
+
+    return response.json();
+  }
+
+  async uploadAvatar(pesId) {
+    const imageResponse = await fetch(TEST_DATA.avatarUrl);
+    if (!imageResponse.ok) {
+      throw new Error(`Failed to fetch image: ${imageResponse.status}`);
+    }
+
+    const imageBlob = await imageResponse.blob();
+    const formData = new FormData();
+    formData.append('files', imageBlob, `avatar${pesId}.jpg`);
+    formData.append('pesId', pesId.toString());
+
+    return this.postFormData('/api/fotos/upload', formData);
+  }
 }
 
 async function main() {
@@ -80,12 +115,36 @@ async function main() {
     const api = new ApiClient(BASE_URL);
     await api.login(TEST_CREDENTIALS);
 
-    const unit = await api.post('/api/unidades', {
-      unidNome: TEST_DATA.unit.name,
-      unidSigla: TEST_DATA.unit.sigla
+    const cidade = await api.post('/api/cidades', {
+      cidNome: "Cidade 1",
+      cidUf: "UF"
     });
-    console.log('Unidade criada:', unit);
-    const unidId = unit.unidId;
+    const cidId = cidade.cidId;
+
+    const enderecoUnidade = await api.post('/api/enderecos', {
+      endTipoLogradouro: "Rua",
+      endLogradouro: "Fictícia Unidade",
+      endNumero: 10,
+      endBairro: "Fictício Unidade",
+      cidadeId: cidId
+    });
+    const endIdUnidade = enderecoUnidade.endId;
+
+    const unidade = await api.post('/api/unidades', {
+      unidNome: TEST_DATA.unit.name,
+      unidSigla: TEST_DATA.unit.sigla,
+      enderecoIds: [endIdUnidade]
+    });
+    const unidId = unidade.unidId;
+
+    const enderecoEfetivo = await api.post('/api/enderecos', {
+      endTipoLogradouro: "Rua",
+      endLogradouro: "Fictícia Efetivo",
+      endNumero: 10,
+      endBairro: "Fictício Efetivo",
+      cidadeId: cidId
+    });
+    const endIdEfetivo = enderecoEfetivo.endId;
 
     const efetivo = await api.post('/api/servidor-efetivo', {
       pesNome: TEST_DATA.efetivo.nome,
@@ -93,10 +152,12 @@ async function main() {
       pesSexo: TEST_DATA.efetivo.sexo,
       pesMae: TEST_DATA.efetivo.mae,
       pesPai: TEST_DATA.efetivo.pai,
-      seMatricula: TEST_DATA.efetivo.matricula
+      seMatricula: TEST_DATA.efetivo.matricula,
+      enderecoIds: [endIdEfetivo]
     });
-    console.log('Servidor efetivo criado:', efetivo);
     const efetPesId = efetivo.pesId;
+    await api.uploadAvatar(efetPesId);
+    console.log('Upload da imagem do efetivo executada com sucesso.');
 
     const temporario = await api.post('/api/servidor-temporario', {
       pesNome: TEST_DATA.temporario.nome,
@@ -107,8 +168,9 @@ async function main() {
       stDataAdmissao: new Date().toISOString(),
       stDataDemissao: null
     });
-    console.log('Servidor temporário criado:', temporario);
     const tempPesId = temporario.pesId;
+
+    console.log('Servidor temporário criado:', { temporario });
 
     const lotacaoEfetivo = await api.post('/api/lotacoes', {
       pesId: efetPesId,
@@ -117,7 +179,7 @@ async function main() {
       lotDataRemocao: null,
       lotPortaria: 'Port. 001'
     });
-    console.log('Lotação do servidor efetivo criada:', lotacaoEfetivo);
+    console.log('Lotação do servidor efetivo criada:', { lotacaoEfetivo });
 
     const lotacaoTemporario = await api.post('/api/lotacoes', {
       pesId: tempPesId,
@@ -126,11 +188,11 @@ async function main() {
       lotDataRemocao: null,
       lotPortaria: 'Port. 002'
     });
-    console.log('Lotação do servidor temporario criada:', lotacaoTemporario);
+    console.log('Lotação do servidor temporario criada:', { lotacaoTemporario });
 
-    console.log('As operações foram concluídas com sucesso.');
+    console.log('Todas as operações foram concluídas com sucesso.');
   } catch (error) {
-    console.error('Erro ao execução o teste:', error);
+    console.error('Erro na execução do teste:', error);
     throw error;
   }
 }

@@ -2,9 +2,9 @@ import lombok.Data;
 
 @Data
 public class EnderecoDTO {
-    private String tipoLogradouro;
-    private String logradouro;
-    private Integer numero;
-    private String bairro;
+    private String endTipoLogradouro;
+    private String endLogradouro;
+    private Integer endNumero;
+    private String endBairro;
     private Integer cidadeId;
 }

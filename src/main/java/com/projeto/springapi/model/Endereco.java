@@ -13,16 +13,16 @@ public class Endereco {
     private Long endId;
 
     @Column(name = "end_tipo_logradouro")
-    private String tipoLogradouro;
+    private String endTipoLogradouro;
 
     @Column(name = "end_logradouro")
-    private String logradouro;
+    private String endLogradouro;
 
     @Column(name = "end_numero")
-    private Integer numero;
+    private Integer endNumero;
 
     @Column(name = "end_bairro")
-    private String bairro;
+    private String endBairro;
 
     @ManyToOne
     @JoinColumn(name = "cid_id")
