@@ -2,8 +2,10 @@ package com.projeto.springapi.service;
 
 import com.projeto.springapi.dto.ServidorEfetivoDTO;
 import com.projeto.springapi.exception.ResourceNotFoundException;
+import com.projeto.springapi.model.Endereco;
 import com.projeto.springapi.model.FotoPessoa;
 import com.projeto.springapi.model.ServidorEfetivo;
+import com.projeto.springapi.repository.EnderecoRepository;
 import com.projeto.springapi.repository.FotoPessoaRepository;
 import com.projeto.springapi.repository.ServidorEfetivoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,7 @@ public class ServidorEfetivoService {
     private FotoPessoaRepository fotoPessoaRepository;
 
     @Autowired
-    private final EnderecoRepository enderecoRepository;
+    private EnderecoRepository enderecoRepository;
 
     private ServidorEfetivoDTO mapToDTO(ServidorEfetivo servidorEfetivo) {
         ServidorEfetivoDTO dto = new ServidorEfetivoDTO();
@@ -42,7 +44,7 @@ public class ServidorEfetivoService {
         FotoPessoa fotoPessoa = fotoPessoaRepository.findByPessoaPesId(servidorEfetivo.getPesId()).stream().findFirst()
                 .orElse(null);
         if (fotoPessoa != null) {
-            dto.setFotoLink("/api/fotos/links/" + servidorEfetivo.getPesId()); // Endpoint para obter link temporário
+            dto.setFotoLink("/api/fotos/links/" + servidorEfetivo.getPesId());
         }
 
         return dto;
@@ -102,18 +104,13 @@ public class ServidorEfetivoService {
         servidorEfetivoRepository.deleteById(id);
     }
 
-    
+    public List<ServidorEfetivoDTO> getServidoresEfetivosByUnidade(Long unidadeId) {
+        List<ServidorEfetivo> servidores = servidorEfetivoRepository.findByLotacaoUnidadeUnidId(unidadeId);
+        return servidores.stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
 
-    // public List<ServidorEfetivoDTO> getServidoresEfetivosByUnidade(Long
-    // unidadeId) {
-    // List<ServidorEfetivo> servidores =
-    // servidorEfetivoRepository.findByLotacaoUnidadeUnidId(unidadeId);
-    // return servidores.stream().map(this::mapToDTO).collect(Collectors.toList());
-    // }
-
-    // public List<ServidorEfetivoDTO> getServidoresEfetivosByNome(String nome) {
-    // List<ServidorEfetivo> servidores =
-    // servidorEfetivoRepository.findByPessoaPesNomeContaining(nome);
-    // return servidores.stream().map(this::mapToDTO).collect(Collectors.toList());
-    // }
+    public List<ServidorEfetivoDTO> getServidoresEfetivosByNome(String nome) {
+        List<ServidorEfetivo> servidores = servidorEfetivoRepository.findByPessoaPesNomeContaining(nome);
+        return servidores.stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
 }

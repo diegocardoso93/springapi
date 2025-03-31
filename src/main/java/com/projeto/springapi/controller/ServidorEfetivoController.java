@@ -5,6 +5,8 @@ import com.projeto.springapi.service.ServidorEfetivoService;
 
 import io.swagger.v3.oas.annotations.Operation;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -67,17 +69,13 @@ public class ServidorEfetivoController {
         return ResponseEntity.noContent().build();
     }
 
-    // @GetMapping("/unidade/{unidadeId}")
-    // public ResponseEntity<List<ServidorEfetivoDTO>>
-    // getServidoresEfetivosByUnidade(@PathVariable Long unidadeId) {
-    // return
-    // ResponseEntity.ok(servidorEfetivoService.getServidoresEfetivosByUnidade(unidadeId));
-    // }
+    @GetMapping("/unidade/{unidadeId}")
+    public ResponseEntity<List<ServidorEfetivoDTO>> getServidoresEfetivosByUnidade(@PathVariable Long unidadeId) {
+        return ResponseEntity.ok(servidorEfetivoService.getServidoresEfetivosByUnidade(unidadeId));
+    }
 
-    // @GetMapping("/endereco-funcional")
-    // public ResponseEntity<List<ServidorEfetivoDTO>>
-    // getServidoresEfetivosByNome(@RequestParam("nome") String nome) {
-    // return
-    // ResponseEntity.ok(servidorEfetivoService.getServidoresEfetivosByNome(nome));
-    // }
+    @GetMapping("/endereco-funcional")
+    public ResponseEntity<List<ServidorEfetivoDTO>> getServidoresEfetivosByNome(@RequestParam("nome") String nome) {
+        return ResponseEntity.ok(servidorEfetivoService.getServidoresEfetivosByNome(nome));
+    }
 }

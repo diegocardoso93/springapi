@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.Where;
+
 import lombok.Data;
 
 @Entity
@@ -44,10 +46,16 @@ public class Pessoa {
     @OneToMany(mappedBy = "pessoa")
     private List<Lotacao> lotacoes = new ArrayList<>();
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pes_id", referencedColumnName = "pessoa_pes_id", insertable = false, updatable = false)
+    @Where(clause = "lot_data_remocao IS NULL")
+    private Lotacao lotacaoAtual;
+
     public Lotacao getLotacaoAtual() {
         return getLotacoes().stream()
                 .filter(l -> l.getLotDataRemocao() == null)
                 .findFirst()
                 .orElse(null);
     }
+
 }

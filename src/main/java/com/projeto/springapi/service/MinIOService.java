@@ -7,7 +7,11 @@ import com.projeto.springapi.repository.FotoPessoaRepository;
 import com.projeto.springapi.repository.PessoaRepository;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.http.Method;
+import io.minio.BucketExistsArgs;
 import io.minio.GetPresignedObjectUrlArgs;
+import io.minio.MakeBucketArgs;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -39,6 +43,10 @@ public class MinIOService {
         try {
             Pessoa pessoa = pessoaRepository.findById(pesId)
                     .orElseThrow(() -> new ResourceNotFoundException("Pessoa não encontrada com id: " + pesId));
+
+            if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build())) {
+                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+            }
 
             for (MultipartFile file : files) {
                 String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
@@ -74,6 +82,7 @@ public class MinIOService {
             for (FotoPessoa foto : fotos) {
                 String url = minioClient.getPresignedObjectUrl(
                         GetPresignedObjectUrlArgs.builder()
+                                .method(Method.GET)
                                 .bucket(bucketName)
                                 .object(foto.getFpHash())
                                 .expiry(5, TimeUnit.MINUTES)
