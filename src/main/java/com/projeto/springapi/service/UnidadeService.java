@@ -37,6 +37,13 @@ public class UnidadeService {
         Unidade unidade = new Unidade();
         unidade.setUnidNome(unidadeDTO.getUnidNome());
         unidade.setUnidSigla(unidadeDTO.getUnidSigla());
+
+        List<Endereco> enderecos = enderecoRepo.findAllById(dto.getEnderecoIds());
+        if (enderecos.size() != dto.getEnderecoIds().size()) {
+            throw new RuntimeException("Um ou mais IDs de endereços inválidos");
+        }
+        unidade.setEnderecos(enderecos);
+
         unidade = unidadeRepository.save(unidade);
         return mapToDTO(unidade);
     }
@@ -46,6 +53,13 @@ public class UnidadeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Unidade não encontrada com id: " + id));
         unidade.setUnidNome(unidadeDTO.getUnidNome());
         unidade.setUnidSigla(unidadeDTO.getUnidSigla());
+        
+        List<Endereco> enderecos = enderecoRepo.findAllById(dto.getEnderecoIds());
+        if (enderecos.size() != dto.getEnderecoIds().size()) {
+            throw new RuntimeException("Um ou mais IDs de endereços inválidos");
+        }
+        unidade.setEnderecos(enderecos);
+
         unidade = unidadeRepository.save(unidade);
         return mapToDTO(unidade);
     }

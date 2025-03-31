@@ -12,10 +12,6 @@ import lombok.EqualsAndHashCode;
 @PrimaryKeyJoinColumn(name = "pes_id")
 public class ServidorTemporario extends Pessoa {
 
-    @Id
-    @Column(name = "pes_id")
-    private Long pesId;
-
     @Column(name = "st_data_admissao")
     private LocalDate stDataAdmissao;
 

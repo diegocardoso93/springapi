@@ -22,6 +22,9 @@ public class ServidorEfetivoService {
     @Autowired
     private FotoPessoaRepository fotoPessoaRepository;
 
+    @Autowired
+    private final EnderecoRepository enderecoRepository;
+
     private ServidorEfetivoDTO mapToDTO(ServidorEfetivo servidorEfetivo) {
         ServidorEfetivoDTO dto = new ServidorEfetivoDTO();
         dto.setPesId(servidorEfetivo.getPesId());
@@ -55,18 +58,42 @@ public class ServidorEfetivoService {
         return mapToDTO(servidorEfetivo);
     }
 
-    public ServidorEfetivoDTO createServidorEfetivo(ServidorEfetivoDTO servidorEfetivoDTO) {
+    public ServidorEfetivoDTO createServidorEfetivo(ServidorEfetivoDTO dto) {
         ServidorEfetivo servidorEfetivo = new ServidorEfetivo();
-        servidorEfetivo.setPesId(servidorEfetivoDTO.getPesId());
-        servidorEfetivo.setSeMatricula(servidorEfetivoDTO.getSeMatricula());
+        servidorEfetivo.setPesId(dto.getPesId());
+        servidorEfetivo.setSeMatricula(dto.getSeMatricula());
+        servidorEfetivo.setPesNome(dto.getPesNome());
+        servidorEfetivo.setPesDataNascimento(dto.getPesDataNascimento());
+        servidorEfetivo.setPesSexo(dto.getPesSexo());
+        servidorEfetivo.setPesMae(dto.getPesMae());
+        servidorEfetivo.setPesPai(dto.getPesPai());
+
+        List<Endereco> enderecos = enderecoRepository.findAllById(dto.getEnderecoIds());
+        if (enderecos.size() != dto.getEnderecoIds().size()) {
+            throw new RuntimeException("Um ou mais IDs de endereços inválidos");
+        }
+        servidorEfetivo.setEnderecos(enderecos);
+
         servidorEfetivo = servidorEfetivoRepository.save(servidorEfetivo);
         return mapToDTO(servidorEfetivo);
     }
 
-    public ServidorEfetivoDTO updateServidorEfetivo(Long id, ServidorEfetivoDTO servidorEfetivoDTO) {
+    public ServidorEfetivoDTO updateServidorEfetivo(Long id, ServidorEfetivoDTO dto) {
         ServidorEfetivo servidorEfetivo = servidorEfetivoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Servidor Efetivo não encontrado com id: " + id));
-        servidorEfetivo.setSeMatricula(servidorEfetivoDTO.getSeMatricula());
+        servidorEfetivo.setSeMatricula(dto.getSeMatricula());
+        servidorEfetivo.setPesNome(dto.getPesNome());
+        servidorEfetivo.setPesDataNascimento(dto.getPesDataNascimento());
+        servidorEfetivo.setPesSexo(dto.getPesSexo());
+        servidorEfetivo.setPesMae(dto.getPesMae());
+        servidorEfetivo.setPesPai(dto.getPesPai());
+
+        List<Endereco> enderecos = enderecoRepository.findAllById(dto.getEnderecoIds());
+        if (enderecos.size() != dto.getEnderecoIds().size()) {
+            throw new RuntimeException("Um ou mais IDs de endereços inválidos");
+        }
+        servidorEfetivo.setEnderecos(enderecos);
+
         servidorEfetivo = servidorEfetivoRepository.save(servidorEfetivo);
         return mapToDTO(servidorEfetivo);
     }
@@ -74,6 +101,8 @@ public class ServidorEfetivoService {
     public void deleteServidorEfetivo(Long id) {
         servidorEfetivoRepository.deleteById(id);
     }
+
+    
 
     // public List<ServidorEfetivoDTO> getServidoresEfetivosByUnidade(Long
     // unidadeId) {

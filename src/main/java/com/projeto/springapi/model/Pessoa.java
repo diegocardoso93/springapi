@@ -33,6 +33,14 @@ public class Pessoa {
     @Column(name = "pes_pai")
     private String pesPai;
 
+    @ManyToMany
+    @JoinTable(
+        name = "pessoa_endereco",
+        joinColumns = @JoinColumn(name = "pes_id"),
+        inverseJoinColumns = @JoinColumn(name = "end_id")
+    )
+    private List<Endereco> enderecos = new ArrayList<>();
+
     @OneToMany(mappedBy = "pessoa")
     private List<Lotacao> lotacoes = new ArrayList<>();
 

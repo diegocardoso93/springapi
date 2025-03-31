@@ -19,4 +19,12 @@ public class Unidade {
     @Column(name = "unid_sigla")
     private String unidSigla;
 
+    @ManyToMany
+    @JoinTable(
+        name = "unidade_endereco",
+        joinColumns = @JoinColumn(name = "unid_id"),
+        inverseJoinColumns = @JoinColumn(name = "end_id")
+    )
+    private List<Endereco> enderecos = new ArrayList<>();
+
 }

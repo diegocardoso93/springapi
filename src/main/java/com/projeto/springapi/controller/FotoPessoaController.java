@@ -26,8 +26,6 @@ public class FotoPessoaController {
                 .collect(Collectors.toList());
         return ResponseEntity.status(HttpStatus.CREATED).body(linkFotoDTOs);
     }
-    // https://img.freepik.com/free-psd/3d-rendering-hair-style-avatar-design_23-2151869153.jpg?t=st=1743362336~exp=1743365936~hmac=2985dbdb11698bce84d2fd7b4c82fb69ee81a7f97efd546ba474b880350a58b7&w=740
-    // https://img.freepik.com/free-psd/3d-rendering-hair-style-avatar-design_23-2151869121.jpg?t=st=1743362366~exp=1743365966~hmac=4bedb9435f0bb42676ae37065caea18ca315f4aa63cefeb7cf3593b4c4b1d7de&w=740
 
     @GetMapping("/links/{pesId}")
     public ResponseEntity<List<LinkFotoDTO>> getFotoLinks(@PathVariable Long pesId) {

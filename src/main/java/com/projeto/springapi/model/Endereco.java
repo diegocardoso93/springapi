@@ -7,26 +7,24 @@ import lombok.Data;
 @Table(name = "endereco")
 @Data
 public class Endereco {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "end_id")
     private Long endId;
 
     @Column(name = "end_tipo_logradouro")
-    private String endTipoLogradouro;
+    private String tipoLogradouro;
 
     @Column(name = "end_logradouro")
-    private String endLogradouro;
+    private String logradouro;
 
     @Column(name = "end_numero")
-    private Integer endNumero;
+    private Integer numero;
 
     @Column(name = "end_bairro")
-    private String endBairro;
+    private String bairro;
 
     @ManyToOne
     @JoinColumn(name = "cid_id")
     private Cidade cidade;
-
 }

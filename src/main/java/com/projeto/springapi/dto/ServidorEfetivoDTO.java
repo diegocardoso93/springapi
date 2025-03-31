@@ -12,7 +12,6 @@ public class ServidorEfetivoDTO {
     private String pesMae;
     private String pesPai;
     private String seMatricula;
-    private Long unidadeId;
-    private String unidadeNome;
-    private String fotoLink;
+
+    private List<Long> enderecoIds;
 }

@@ -1,6 +1,7 @@
 package com.projeto.springapi.controller;
 
 import com.projeto.springapi.dto.UnidadeDTO;
+import com.projeto.springapi.dto.EnderecoDTO;
 import com.projeto.springapi.service.UnidadeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -40,5 +41,11 @@ public class UnidadeController {
     public ResponseEntity<Void> deleteUnidade(@PathVariable Long id) {
         unidadeService.deleteUnidade(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{unidadeId}/enderecos")
+    public ResponseEntity<Unidade> addEnderecoToUnidade(@PathVariable Integer unidadeId, @RequestBody EnderecoDTO enderecoDTO) {
+        Unidade updatedUnidade = unidadeService.addEnderecoToUnidade(unidadeId, enderecoDTO);
+        return ResponseEntity.ok(updatedUnidade);
     }
 }

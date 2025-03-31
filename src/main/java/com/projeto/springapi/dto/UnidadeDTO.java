@@ -7,4 +7,6 @@ public class UnidadeDTO {
     private Long unidId;
     private String unidNome;
     private String unidSigla;
+
+    private List<Long> enderecoIds;
 }
