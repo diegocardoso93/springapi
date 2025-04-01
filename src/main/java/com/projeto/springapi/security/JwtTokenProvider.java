@@ -25,7 +25,7 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration}")
     private int expiration;
 
-    @Value("${jwt.expiration}")
+    @Value("${jwt.refresh.expiration}")
     private int refreshExpiration;
 
     public String generateToken(UserDetails userDetails) {
@@ -37,21 +37,15 @@ public class JwtTokenProvider {
     }
 
     public String generateToken(Map<String, Object> claims, String subject, long expirationTime) {
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
+        return Jwts.builder().setClaims(claims).setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime * 1000))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS512)
-                .compact();
+                .signWith(getSignInKey(), SignatureAlgorithm.HS512).compact();
     }
 
     public String getUsernameFromToken(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSignInKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        Claims claims = Jwts.parserBuilder().setSigningKey(getSignInKey()).build()
+                .parseClaimsJws(token).getBody();
 
         return claims.getSubject();
     }

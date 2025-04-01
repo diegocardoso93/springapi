@@ -11,10 +11,11 @@ import lombok.EqualsAndHashCode;
 @PrimaryKeyJoinColumn(name = "pes_id")
 public class ServidorEfetivo extends Pessoa {
 
+    @Id
+    @Column(name = "pes_id")
+    private Long pesId;
+
     @Column(name = "se_matricula")
     private String seMatricula;
 
-    @ManyToOne
-    @JoinColumn(name = "unidade_id")
-    private Unidade lotacaoUnidade;
 }

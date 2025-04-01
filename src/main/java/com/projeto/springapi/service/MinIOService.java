@@ -41,22 +41,29 @@ public class MinIOService {
     public List<String> uploadFiles(MultipartFile[] files, Long pesId) {
         List<String> uploadedFiles = new ArrayList<>();
         try {
-            Pessoa pessoa = pessoaRepository.findById(pesId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Pessoa não encontrada com id: " + pesId));
+            Pessoa pessoa = pessoaRepository.findById(pesId).orElseThrow(
+                    () -> new ResourceNotFoundException("Pessoa não encontrada com id: " + pesId));
 
             if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build())) {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
             }
 
             for (MultipartFile file : files) {
+                if (file.isEmpty() || file.getSize() == 0) {
+                    throw new RuntimeException("Arquivo vazio não pode ser enviado.");
+                }
+
+                System.out.println("Tamanho do arquivo: " + file.getSize() + " bytes");
+
                 String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
                 InputStream inputStream = file.getInputStream();
-                PutObjectArgs putObjectArgs = PutObjectArgs.builder()
-                        .bucket(bucketName)
-                        .object(fileName)
-                        .stream(inputStream, file.getSize(), -1)
-                        .contentType(file.getContentType())
-                        .build();
+
+                int availableBytes = inputStream.available();
+                System.out.println("Bytes disponíveis no InputStream: " + availableBytes);
+
+                PutObjectArgs putObjectArgs = PutObjectArgs.builder().bucket(bucketName)
+                        .object(fileName).stream(inputStream, file.getSize(), 5242880) // 5MB buffer
+                        .contentType(file.getContentType()).build();
                 minioClient.putObject(putObjectArgs);
 
                 FotoPessoa fotoPessoa = new FotoPessoa();
@@ -81,12 +88,8 @@ public class MinIOService {
         try {
             for (FotoPessoa foto : fotos) {
                 String url = minioClient.getPresignedObjectUrl(
-                        GetPresignedObjectUrlArgs.builder()
-                                .method(Method.GET)
-                                .bucket(bucketName)
-                                .object(foto.getFpHash())
-                                .expiry(5, TimeUnit.MINUTES)
-                                .build());
+                        GetPresignedObjectUrlArgs.builder().method(Method.GET).bucket(bucketName)
+                                .object(foto.getFpHash()).expiry(5, TimeUnit.MINUTES).build());
                 links.add(url);
             }
         } catch (Exception e) {

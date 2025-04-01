@@ -35,24 +35,19 @@ public class AuthController {
     private UserDetailsServiceImpl userDetailsService;
 
     @PostMapping("/login")
-    @Operation(
-            summary = "Autentica um usuário e retorna um token JWT",
+    @Operation(summary = "Autentica um usuário e retorna um token JWT",
             description = "Realiza a autenticação do usuário com base no nome de usuário e senha fornecidos.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Credenciais do usuário para login",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = LoginRequest.class))
-            ),
+                    description = "Credenciais do usuário para login", required = true,
+                    content = @Content(schema = @Schema(implementation = LoginRequest.class))),
             responses = {
                     @ApiResponse(responseCode = "200", description = "Autenticação bem-sucedida",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = LoginResponse.class))),
-                    @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
-            }
-    )
+                    @ApiResponse(responseCode = "401", description = "Credenciais inválidas")})
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                loginRequest.getUsername(), loginRequest.getPassword()));
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUsername());
         String token = jwtTokenProvider.generateToken(userDetails);
@@ -62,21 +57,18 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    @Operation(
-            summary = "Renova o token JWT",
+    @Operation(summary = "Renova o token JWT",
             description = "Utiliza um refresh token válido para gerar um novo token JWT e um novo refresh token.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Refresh token para renovação",
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = RefreshTokenRequest.class))
-            ),
+                    description = "Refresh token para renovação", required = true,
+                    content = @Content(
+                            schema = @Schema(implementation = RefreshTokenRequest.class))),
             responses = {
                     @ApiResponse(responseCode = "200", description = "Token renovado com sucesso",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = LoginResponse.class))),
-                    @ApiResponse(responseCode = "400", description = "Refresh token inválido ou expirado")
-            }
-    )
+                    @ApiResponse(responseCode = "400",
+                            description = "Refresh token inválido ou expirado")})
     public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
         String refreshToken = refreshTokenRequest.getRefreshToken();
         if (refreshToken != null && jwtTokenProvider.validateToken(refreshToken)) {

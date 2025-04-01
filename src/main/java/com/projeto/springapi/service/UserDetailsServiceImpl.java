@@ -22,7 +22,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (this.authUsername.equals(username)) {
-            return new User(username, new BCryptPasswordEncoder().encode(authPassword), new ArrayList<>());
+            return new User(username, new BCryptPasswordEncoder().encode(authPassword),
+                    new ArrayList<>());
         } else {
             throw new UsernameNotFoundException("Usuário não encontrado com o nome: " + username);
         }

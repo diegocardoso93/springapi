@@ -7,6 +7,7 @@ import lombok.Data;
 @Table(name = "endereco")
 @Data
 public class Endereco {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "end_id")
@@ -27,4 +28,5 @@ public class Endereco {
     @ManyToOne
     @JoinColumn(name = "cid_id")
     private Cidade cidade;
+
 }

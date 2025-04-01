@@ -36,26 +36,11 @@ public class Pessoa {
     private String pesPai;
 
     @ManyToMany
-    @JoinTable(
-        name = "pessoa_endereco",
-        joinColumns = @JoinColumn(name = "pes_id"),
-        inverseJoinColumns = @JoinColumn(name = "end_id")
-    )
+    @JoinTable(name = "pessoa_endereco", joinColumns = @JoinColumn(name = "pes_id"),
+            inverseJoinColumns = @JoinColumn(name = "end_id"))
     private List<Endereco> enderecos = new ArrayList<>();
 
     @OneToMany(mappedBy = "pessoa")
     private List<Lotacao> lotacoes = new ArrayList<>();
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pes_id", referencedColumnName = "pessoa_pes_id", insertable = false, updatable = false)
-    @Where(clause = "lot_data_remocao IS NULL")
-    private Lotacao lotacaoAtual;
-
-    public Lotacao getLotacaoAtual() {
-        return getLotacoes().stream()
-                .filter(l -> l.getLotDataRemocao() == null)
-                .findFirst()
-                .orElse(null);
-    }
 
 }

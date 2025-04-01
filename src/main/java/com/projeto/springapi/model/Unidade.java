@@ -1,5 +1,8 @@
 package com.projeto.springapi.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -20,11 +23,7 @@ public class Unidade {
     private String unidSigla;
 
     @ManyToMany
-    @JoinTable(
-        name = "unidade_endereco",
-        joinColumns = @JoinColumn(name = "unid_id"),
-        inverseJoinColumns = @JoinColumn(name = "end_id")
-    )
+    @JoinTable(name = "unidade_endereco", joinColumns = @JoinColumn(name = "unid_id"), inverseJoinColumns = @JoinColumn(name = "end_id"))
     private List<Endereco> enderecos = new ArrayList<>();
 
 }

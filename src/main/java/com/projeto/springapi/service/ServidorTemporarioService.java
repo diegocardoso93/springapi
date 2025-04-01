@@ -2,9 +2,7 @@ package com.projeto.springapi.service;
 
 import com.projeto.springapi.dto.ServidorTemporarioDTO;
 import com.projeto.springapi.exception.ResourceNotFoundException;
-import com.projeto.springapi.model.Pessoa;
 import com.projeto.springapi.model.ServidorTemporario;
-import com.projeto.springapi.repository.PessoaRepository;
 import com.projeto.springapi.repository.ServidorTemporarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,8 +14,6 @@ public class ServidorTemporarioService {
 
     @Autowired
     private ServidorTemporarioRepository servidorTemporarioRepository;
-    @Autowired
-    private PessoaRepository pessoaRepository;
 
     private ServidorTemporarioDTO mapToDTO(ServidorTemporario servidorTemporario) {
         ServidorTemporarioDTO dto = new ServidorTemporarioDTO();
@@ -38,31 +34,31 @@ public class ServidorTemporarioService {
 
     public ServidorTemporarioDTO getServidorTemporarioById(Long id) {
         ServidorTemporario servidorTemporario = servidorTemporarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Servidor Temporário não encontrado com id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Servidor Temporário não encontrado com id: " + id));
         return mapToDTO(servidorTemporario);
     }
 
-    public ServidorTemporarioDTO createServidorTemporario(ServidorTemporarioDTO servidorTemporarioDTO) {
+    public ServidorTemporarioDTO createServidorTemporario(
+            ServidorTemporarioDTO servidorTemporarioDTO) {
         ServidorTemporario servidorTemporario = new ServidorTemporario();
         servidorTemporario.setPesId(servidorTemporarioDTO.getPesId());
-
-        Pessoa pessoa = pessoaRepository.findById(servidorTemporarioDTO.getPesId())
-                .orElseThrow(() -> new ResourceNotFoundException("Pessoa não encontrada"));
-        servidorTemporario.setPesNome(pessoa.getPesNome());
-        servidorTemporario.setPesDataNascimento(pessoa.getPesDataNascimento());
-        servidorTemporario.setPesSexo(pessoa.getPesSexo());
-        servidorTemporario.setPesMae(pessoa.getPesMae());
-        servidorTemporario.setPesPai(pessoa.getPesPai());
-
+        servidorTemporario.setPesNome(servidorTemporarioDTO.getPesNome());
+        servidorTemporario.setPesDataNascimento(servidorTemporarioDTO.getPesDataNascimento());
+        servidorTemporario.setPesSexo(servidorTemporarioDTO.getPesSexo());
+        servidorTemporario.setPesMae(servidorTemporarioDTO.getPesMae());
+        servidorTemporario.setPesPai(servidorTemporarioDTO.getPesPai());
         servidorTemporario.setStDataAdmissao(servidorTemporarioDTO.getStDataAdmissao());
         servidorTemporario.setStDataDemissao(servidorTemporarioDTO.getStDataDemissao());
         servidorTemporario = servidorTemporarioRepository.save(servidorTemporario);
         return mapToDTO(servidorTemporario);
     }
 
-    public ServidorTemporarioDTO updateServidorTemporario(Long id, ServidorTemporarioDTO servidorTemporarioDTO) {
+    public ServidorTemporarioDTO updateServidorTemporario(Long id,
+            ServidorTemporarioDTO servidorTemporarioDTO) {
         ServidorTemporario servidorTemporario = servidorTemporarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Servidor Temporário não encontrado com id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Servidor Temporário não encontrado com id: " + id));
         servidorTemporario.setStDataAdmissao(servidorTemporarioDTO.getStDataAdmissao());
         servidorTemporario.setStDataDemissao(servidorTemporarioDTO.getStDataDemissao());
         servidorTemporario = servidorTemporarioRepository.save(servidorTemporario);

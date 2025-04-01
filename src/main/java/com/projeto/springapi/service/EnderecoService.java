@@ -29,8 +29,6 @@ public class EnderecoService {
         dto.setEndBairro(endereco.getEndBairro());
         if (endereco.getCidade() != null) {
             dto.setCidadeId(endereco.getCidade().getCidId());
-            dto.setCidadeNome(endereco.getCidade().getCidNome());
-            dto.setUfSigla(endereco.getCidade().getUf().getUfSigla());
         }
         return dto;
     }
@@ -39,15 +37,16 @@ public class EnderecoService {
         return enderecoRepository.findAll(pageable).map(this::mapToDTO);
     }
 
-    public EnderecoDTO getEnderecoById(Integer id) {
-        Endereco endereco = enderecoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Endereço não encontrado com ID: " + id));
+    public EnderecoDTO getEnderecoById(Long id) {
+        Endereco endereco = enderecoRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Endereço não encontrado com ID: " + id));
         return mapToDTO(endereco);
     }
 
     public EnderecoDTO createEndereco(EnderecoDTO dto) {
         Cidade cidade = cidadeRepository.findById(dto.getCidadeId())
-                .orElseThrow(() -> new ResourceNotFoundException("Cidade não encontrada com ID: " + dto.getCidadeId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Cidade não encontrada com ID: " + dto.getCidadeId()));
 
         Endereco endereco = new Endereco();
         endereco.setEndTipoLogradouro(dto.getEndTipoLogradouro());
@@ -60,12 +59,13 @@ public class EnderecoService {
         return mapToDTO(savedEndereco);
     }
 
-    public EnderecoDTO updateEndereco(Integer id, EnderecoDTO dto) {
-        Endereco existingEndereco = enderecoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Endereço não encontrado com ID: " + id));
+    public EnderecoDTO updateEndereco(Long id, EnderecoDTO dto) {
+        Endereco existingEndereco = enderecoRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Endereço não encontrado com ID: " + id));
 
         Cidade cidade = cidadeRepository.findById(dto.getCidadeId())
-                .orElseThrow(() -> new ResourceNotFoundException("Cidade não encontrada com ID: " + dto.getCidadeId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Cidade não encontrada com ID: " + dto.getCidadeId()));
 
         existingEndereco.setEndTipoLogradouro(dto.getEndTipoLogradouro());
         existingEndereco.setEndLogradouro(dto.getEndLogradouro());
@@ -77,7 +77,7 @@ public class EnderecoService {
         return mapToDTO(updatedEndereco);
     }
 
-    public void deleteEndereco(Integer id) {
+    public void deleteEndereco(Long id) {
         if (!enderecoRepository.existsById(id)) {
             throw new ResourceNotFoundException("Endereço não encontrado com ID: " + id);
         }

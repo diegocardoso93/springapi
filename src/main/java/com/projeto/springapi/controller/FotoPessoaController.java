@@ -27,62 +27,49 @@ public class FotoPessoaController {
     private MinIOService minIOService;
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(
-            summary = "Upload de múltiplas fotos",
+    @Operation(summary = "Upload de múltiplas fotos",
             description = "Faz o upload de uma ou mais fotos para um determinado ID de pessoa.",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Arquivos de imagem a serem enviados e o ID da pessoa associada.",
-                    required = true,
-                    content = {
-                            @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
-                                    schema = @Schema(type = "object",
-                                            properties = {
-                                                    @Schema(name = "files", type = "array",
-                                                            array = @ArraySchema(schema = @Schema(type = "string", format = "binary")),
-                                                            description = "Selecione os arquivos de imagem para upload."),
-                                                    @Schema(name = "pesId", type = "integer", format = "int64",
-                                                            description = "ID da pessoa à qual as fotos pertencem.")
-                                            }))
-                    }
-            ),
+                    required = true),
             responses = {
                     @ApiResponse(responseCode = "201", description = "Upload realizado com sucesso",
                             content = @Content(mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = LinkFotoDTO.class)))),
-                    @ApiResponse(responseCode = "400", description = "Requisição inválida (por exemplo, arquivos vazios ou ID inválido)"),
-                    @ApiResponse(responseCode = "500", description = "Erro interno no servidor")
-            }
-    )
+                                    array = @ArraySchema(
+                                            schema = @Schema(implementation = LinkFotoDTO.class)))),
+                    @ApiResponse(responseCode = "400",
+                            description = "Requisição inválida (por exemplo, arquivos vazios ou ID inválido)"),
+                    @ApiResponse(responseCode = "500", description = "Erro interno no servidor")})
     public ResponseEntity<List<LinkFotoDTO>> uploadFotos(
-            @Parameter(description = "Arquivos de imagem para upload", required = true) @RequestParam("files") MultipartFile[] files,
-            @Parameter(description = "ID da pessoa associada às fotos", required = true) @RequestParam("pesId") Long pesId) {
+            @Parameter(description = "Arquivos de imagem para upload",
+                    required = true) @RequestParam("files") MultipartFile[] files,
+            @Parameter(description = "ID da pessoa associada às fotos",
+                    required = true) @RequestParam("pesId") Long pesId) {
         List<String> links = minIOService.uploadFiles(files, pesId);
-        List<LinkFotoDTO> linkFotoDTOs = links.stream()
-                .map(link -> new LinkFotoDTO(link))
-                .collect(Collectors.toList());
+        List<LinkFotoDTO> linkFotoDTOs =
+                links.stream().map(link -> new LinkFotoDTO(link)).collect(Collectors.toList());
         return ResponseEntity.status(HttpStatus.CREATED).body(linkFotoDTOs);
     }
 
     @GetMapping("/links/{pesId}")
-    @Operation(
-            summary = "Lista os links das fotos de uma pessoa",
+    @Operation(summary = "Lista os links das fotos de uma pessoa",
             description = "Retorna uma lista de links de acesso às fotos associadas a um determinado ID de pessoa.",
-            parameters = {
-                    @Parameter(name = "pesId", description = "ID da pessoa para buscar os links das fotos", required = true, schema = @Schema(type = "integer", format = "int64"))
-            },
+            parameters = {@Parameter(name = "pesId",
+                    description = "ID da pessoa para buscar os links das fotos", required = true,
+                    schema = @Schema(type = "integer", format = "int64"))},
             responses = {
                     @ApiResponse(responseCode = "200", description = "Links das fotos encontrados",
                             content = @Content(mediaType = "application/json",
-                                    array = @ArraySchema(schema = @Schema(implementation = LinkFotoDTO.class)))),
-                    @ApiResponse(responseCode = "404", description = "Nenhuma foto encontrada para o ID da pessoa informado"),
-                    @ApiResponse(responseCode = "500", description = "Erro interno no servidor")
-            }
-    )
-    public ResponseEntity<List<LinkFotoDTO>> getFotoLinks(@Parameter(description = "ID da pessoa", required = true) @PathVariable Long pesId) {
+                                    array = @ArraySchema(
+                                            schema = @Schema(implementation = LinkFotoDTO.class)))),
+                    @ApiResponse(responseCode = "404",
+                            description = "Nenhuma foto encontrada para o ID da pessoa informado"),
+                    @ApiResponse(responseCode = "500", description = "Erro interno no servidor")})
+    public ResponseEntity<List<LinkFotoDTO>> getFotoLinks(
+            @Parameter(description = "ID da pessoa", required = true) @PathVariable Long pesId) {
         List<String> links = minIOService.getFotoLinks(pesId);
-        List<LinkFotoDTO> linkFotoDTOs = links.stream()
-                .map(link -> new LinkFotoDTO(link))
-                .collect(Collectors.toList());
+        List<LinkFotoDTO> linkFotoDTOs =
+                links.stream().map(link -> new LinkFotoDTO(link)).collect(Collectors.toList());
         return ResponseEntity.ok(linkFotoDTOs);
     }
 }

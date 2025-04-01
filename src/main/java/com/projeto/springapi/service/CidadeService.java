@@ -18,7 +18,7 @@ public class CidadeService {
     private CidadeDTO mapToDTO(Cidade cidade) {
         CidadeDTO dto = new CidadeDTO();
         dto.setCidId(cidade.getCidId());
-        dto.setNome(cidade.getNome());
+        dto.setCidNome(cidade.getCidNome());
         dto.setCidUf(cidade.getCidUf());
         return dto;
     }
@@ -28,23 +28,23 @@ public class CidadeService {
     }
 
     public CidadeDTO getCidadeById(Long id) {
-        Cidade cidade = cidadeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Cidade não encontrada com ID: " + id));
+        Cidade cidade = cidadeRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Cidade não encontrada com ID: " + id));
         return mapToDTO(cidade);
     }
 
     public CidadeDTO createCidade(CidadeDTO dto) {
         Cidade cidade = new Cidade();
-        cidade.setNome(dto.getNome());
+        cidade.setCidNome(dto.getCidNome());
         cidade.setCidUf(dto.getCidUf());
         Cidade savedCidade = cidadeRepository.save(cidade);
         return mapToDTO(savedCidade);
     }
 
     public CidadeDTO updateCidade(Long id, CidadeDTO dto) {
-        Cidade existingCidade = cidadeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Cidade não encontrada com ID: " + id));
-        existingCidade.setNome(dto.getNome());
+        Cidade existingCidade = cidadeRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Cidade não encontrada com ID: " + id));
+        existingCidade.setCidNome(dto.getCidNome());
         existingCidade.setCidUf(dto.getCidUf());
         Cidade updatedCidade = cidadeRepository.save(existingCidade);
         return mapToDTO(updatedCidade);

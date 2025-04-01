@@ -1,5 +1,7 @@
 package com.projeto.springapi.dto;
 
+import java.util.List;
+
 import lombok.Data;
 
 @Data

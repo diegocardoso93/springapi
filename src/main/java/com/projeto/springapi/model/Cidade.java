@@ -7,12 +7,16 @@ import lombok.Data;
 @Table(name = "cidade")
 @Data
 public class Cidade {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cid_id")
     private Long cidId;
+
     @Column(name = "cid_nome")
-    private String nome;
+    private String cidNome;
+
     @Column(name = "cid_uf")
     private String cidUf;
+
 }

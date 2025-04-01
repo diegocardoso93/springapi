@@ -18,8 +18,10 @@ public class LotacaoService {
 
     @Autowired
     private LotacaoRepository lotacaoRepository;
+
     @Autowired
     private PessoaRepository pessoaRepository;
+
     @Autowired
     private UnidadeRepository unidadeRepository;
 
@@ -39,8 +41,8 @@ public class LotacaoService {
     }
 
     public LotacaoDTO getLotacaoById(Long id) {
-        Lotacao lotacao = lotacaoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Lotação não encontrada com id: " + id));
+        Lotacao lotacao = lotacaoRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Lotação não encontrada com id: " + id));
         return mapToDTO(lotacao);
     }
 
@@ -48,8 +50,8 @@ public class LotacaoService {
         Lotacao lotacao = new Lotacao();
 
         Pessoa pessoa = pessoaRepository.findById(lotacaoDTO.getPesId())
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Pessoa não encontrada com id: " + lotacaoDTO.getPesId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Pessoa não encontrada com id: " + lotacaoDTO.getPesId()));
         lotacao.setPessoa(pessoa);
 
         Unidade unidade = unidadeRepository.findById(lotacaoDTO.getUnidId())
@@ -65,12 +67,12 @@ public class LotacaoService {
     }
 
     public LotacaoDTO updateLotacao(Long id, LotacaoDTO lotacaoDTO) {
-        Lotacao lotacao = lotacaoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Lotação não encontrada com id: " + id));
+        Lotacao lotacao = lotacaoRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Lotação não encontrada com id: " + id));
 
         Pessoa pessoa = pessoaRepository.findById(lotacaoDTO.getPesId())
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Pessoa não encontrada com id: " + lotacaoDTO.getPesId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Pessoa não encontrada com id: " + lotacaoDTO.getPesId()));
         lotacao.setPessoa(pessoa);
 
         Unidade unidade = unidadeRepository.findById(lotacaoDTO.getUnidId())
