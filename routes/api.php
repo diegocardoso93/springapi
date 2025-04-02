@@ -2,11 +2,11 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\CidadeController;
-use App\Http\Controllers\API\EnderecoController;
-use App\Http\Controllers\API\FotoPessoaController;
-use App\Http\Controllers\API\LotacaoController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CidadeController;
+use App\Http\Controllers\EnderecoController;
+use App\Http\Controllers\FotoPessoaController;
+use App\Http\Controllers\LotacaoController;
 use App\Http\Controllers\ServidorEfetivoController;
 
 /*
@@ -21,12 +21,12 @@ use App\Http\Controllers\ServidorEfetivoController;
 */
 
 // Public routes
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/api/login', [AuthController::class, 'login']);
 
 Route::group(['middleware' => ['auth:jwt']], function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/refresh', [AuthController::class, 'refresh']);
-    Route::get('/user', [AuthController::class, 'me']);
+    Route::post('/api/logout', [AuthController::class, 'logout']);
+    Route::post('/api/refresh', [AuthController::class, 'refresh']);
+    Route::get('/api/user', [AuthController::class, 'me']);
 
     Route::prefix('/api/cidades')->group(function () {
         Route::get('/', [CidadeController::class, 'index']);
@@ -56,7 +56,7 @@ Route::group(['middleware' => ['auth:jwt']], function () {
         Route::delete('/{id}', [LotacaoController::class, 'destroy']);
     });
 
-    Route::prefix('servidores-efetivos')->group(function () {
+    Route::prefix('/api/servidores-efetivos')->group(function () {
         Route::get('/', [ServidorEfetivoController::class, 'index']);
         Route::post('/', [ServidorEfetivoController::class, 'store']);
         Route::get('/{id}', [ServidorEfetivoController::class, 'show']);
@@ -68,7 +68,7 @@ Route::group(['middleware' => ['auth:jwt']], function () {
         Route::get('/endereco-funcional', [ServidorEfetivoController::class, 'getEnderecoFuncionalByNome']);
     });
 
-    Route::prefix('servidores-temporarios')->group(function () {
+    Route::prefix('/api/servidores-temporarios')->group(function () {
         Route::get('/', [ServidorTemporarioController::class, 'index']);
         Route::post('/', [ServidorTemporarioController::class, 'store']);
         Route::get('/{id}', [ServidorTemporarioController::class, 'show']);
@@ -76,7 +76,7 @@ Route::group(['middleware' => ['auth:jwt']], function () {
         Route::delete('/{id}', [ServidorTemporarioController::class, 'destroy']);
     });
 
-    Route::prefix('unidades')->group(function () {
+    Route::prefix('/api/unidades')->group(function () {
         Route::get('/', [UnidadeController::class, 'index']);
         Route::post('/', [UnidadeController::class, 'store']);
         Route::get('/{id}', [UnidadeController::class, 'show']);
