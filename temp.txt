@@ -1,0 +1,12 @@
+docker-compose exec app php artisan key:generate
+
+
+composer require tymon/jwt-auth
+composer require darkaonline/l5-swagger
+composer require league/flysystem-aws-s3-v3 "~3.0"
+
+php artisan migrate
+
+php artisan vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider"
+php artisan jwt:secret
+
