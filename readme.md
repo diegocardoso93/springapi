@@ -4,7 +4,7 @@ Autor: Diego Cardoso
 
 Para rodar a aplicação:
 ```
-docker compose up
+docker compose up --build
 ```
 
 Acessar a página: `http://localhost:8080/swagger-ui/index.html`  
