@@ -11,4 +11,4 @@ docker-compose exec app php artisan migrate
 ```
 
 Acessar a página: `http://localhost:8080/swagger-ui/index.html`  
-Para testar sem problemas de CORS colar o conteúdo do arquivo `endToEndTestScript.js` no console.
+Para testar sem problemas de CORS, colar o conteúdo do arquivo `endToEndTestScript.js` no console.
