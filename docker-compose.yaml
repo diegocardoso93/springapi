@@ -49,6 +49,7 @@ services:
       JWT_REFRESH_EXPIRATION: 604800000 # 7 dias
       API_AUTH_USERNAME: "ADMIN_USER" # usuario local para uso de api
       API_AUTH_PASSWORD: "PASSWORD" # senha do usuario local
+      SERVER_PORT: 8080
 volumes:
   db_data:
   minio_data:

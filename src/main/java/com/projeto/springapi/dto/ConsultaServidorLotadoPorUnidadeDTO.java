@@ -8,5 +8,5 @@ public class ConsultaServidorLotadoPorUnidadeDTO {
     private String nome;
     private Integer idade;
     private String unidade;
-    private String fotografia;
+    private String linkFoto;
 }

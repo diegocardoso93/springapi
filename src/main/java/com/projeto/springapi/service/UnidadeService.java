@@ -92,11 +92,9 @@ public class UnidadeService {
 
         EnderecoDTO enderecoCriado = enderecoService.createEndereco(enderecoDTO);
         List<Endereco> enderecos = unidade.getEnderecos();
-        if (enderecos.size() > 0) {
-            Endereco newEndereco = new Endereco();
-            newEndereco.setEndId(enderecoCriado.getEndId());
-            enderecos.add(newEndereco);
-        }
+        Endereco newEndereco = new Endereco();
+        newEndereco.setEndId(enderecoCriado.getEndId());
+        enderecos.add(newEndereco);
         unidade.setEnderecos(enderecos);
 
         unidade = unidadeRepository.save(unidade);

@@ -4,20 +4,16 @@ import com.projeto.springapi.dto.ConsultaEnderecoFuncionalServidorEfetivoPorNome
 import com.projeto.springapi.dto.ConsultaServidorLotadoPorUnidadeDTO;
 import com.projeto.springapi.dto.EnderecoDTO;
 import com.projeto.springapi.dto.ServidorEfetivoDTO;
-import com.projeto.springapi.dto.UnidadeDTO;
 import com.projeto.springapi.exception.ResourceNotFoundException;
 import com.projeto.springapi.model.Endereco;
-import com.projeto.springapi.model.FotoPessoa;
 import com.projeto.springapi.model.ServidorEfetivo;
-import com.projeto.springapi.model.Unidade;
 import com.projeto.springapi.repository.EnderecoRepository;
-import com.projeto.springapi.repository.FotoPessoaRepository;
 import com.projeto.springapi.repository.ServidorEfetivoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,9 +22,6 @@ public class ServidorEfetivoService {
 
     @Autowired
     private ServidorEfetivoRepository servidorEfetivoRepository;
-
-    @Autowired
-    private FotoPessoaRepository fotoPessoaRepository;
 
     @Autowired
     private EnderecoRepository enderecoRepository;
@@ -50,18 +43,7 @@ public class ServidorEfetivoService {
         dto.setSeMatricula(servidorEfetivo.getSeMatricula());
         dto.setEnderecoIds(servidorEfetivo.getEnderecos().stream().map(Endereco::getEndId)
                 .collect(Collectors.toList()));
-
-        // if (servidorEfetivo.getLotacaoAtual() != null) {
-        // dto.setUnidadeId(servidorEfetivo.getLotacaoAtual().getUnidade().getUnidId());
-        // dto.setUnidadeNome(servidorEfetivo.getLotacaoAtual().getUnidade().getUnidNome());
-        // }
-
-        // FotoPessoa fotoPessoa =
-        // fotoPessoaRepository.findByPessoaPesId(servidorEfetivo.getPesId())
-        // .stream().findFirst().orElse(null);
-        // if (fotoPessoa != null) {
-        // dto.setFotoLink("/api/fotos/links/" + servidorEfetivo.getPesId());
-        // }
+        dto.setFotoLinks(minIOService.getFotoLinks(servidorEfetivo.getPesId()));
 
         return dto;
     }
@@ -132,66 +114,58 @@ public class ServidorEfetivoService {
 
         EnderecoDTO enderecoCriado = enderecoService.createEndereco(enderecoDTO);
         List<Endereco> enderecos = servidorEfetivo.getEnderecos();
-        if (enderecos.size() > 0) {
-            Endereco newEndereco = new Endereco();
-            newEndereco.setEndId(enderecoCriado.getEndId());
-            enderecos.add(newEndereco);
-        }
+        Endereco newEndereco = new Endereco();
+        newEndereco.setEndId(enderecoCriado.getEndId());
+        enderecos.add(newEndereco);
         servidorEfetivo.setEnderecos(enderecos);
 
         servidorEfetivo = servidorEfetivoRepository.save(servidorEfetivo);
         return mapToDTO(servidorEfetivo);
     }
 
-    public List<ConsultaServidorLotadoPorUnidadeDTO> findServidoresEfetivosLotadosPorUnidade(
-            Long unidadeId) {
-        return mapFindServidoresEfetivosLotadosPorUnidadeToDTO(
-                servidorEfetivoRepository.findServidoresEfetivosLotadosPorUnidade(unidadeId));
+    public Page<ConsultaServidorLotadoPorUnidadeDTO> findServidoresEfetivosLotadosPorUnidade(
+            Long unidadeId, Pageable pageable) {
+        Page<Object[]> pageResult = servidorEfetivoRepository
+                .findServidoresEfetivosLotadosPorUnidade(unidadeId, pageable);
+        return pageResult.map(this::mapFindServidoresEfetivosLotadosPorUnidadeToDTO);
     }
 
-    public List<ConsultaServidorLotadoPorUnidadeDTO> mapFindServidoresEfetivosLotadosPorUnidadeToDTO(
-            List<Object[]> result) {
-        List<ConsultaServidorLotadoPorUnidadeDTO> dtos = new ArrayList<>();
-        for (Object[] row : result) {
-            ConsultaServidorLotadoPorUnidadeDTO dto = new ConsultaServidorLotadoPorUnidadeDTO();
-            dto.setPesId((Long) row[0]);
-            dto.setNome((String) row[1]);
-            dto.setIdade((Integer) row[2]);
-            dto.setUnidade((String) row[3]);
-            List<String> fotoLinks = minIOService.getFotoLinks(dto.getPesId());
-            dto.setFotografia(fotoLinks.isEmpty() ? null : fotoLinks.get(0));
-            dtos.add(dto);
-        }
-        return dtos;
+    public ConsultaServidorLotadoPorUnidadeDTO mapFindServidoresEfetivosLotadosPorUnidadeToDTO(
+            Object[] row) {
+        ConsultaServidorLotadoPorUnidadeDTO dto = new ConsultaServidorLotadoPorUnidadeDTO();
+        dto.setPesId((Long) row[0]);
+        dto.setNome((String) row[1]);
+        dto.setIdade(Integer.valueOf(((BigDecimal) row[2]).intValue()));
+        dto.setUnidade((String) row[3]);
+        List<String> fotoLinks = minIOService.getFotoLinks(dto.getPesId());
+        dto.setLinkFoto(fotoLinks.isEmpty() ? null : fotoLinks.get(0));
+        return dto;
     }
 
-    public List<ConsultaEnderecoFuncionalServidorEfetivoPorNomeDTO> getEnderecoFuncionalByServidorNomeContaining(
-            String nome) {
-        return mapFindEnderecoFuncionalByServidorNomeContainingToDTO(
-                servidorEfetivoRepository.findEnderecoFuncionalByServidorNomeContaining(nome));
+    public Page<ConsultaEnderecoFuncionalServidorEfetivoPorNomeDTO> getEnderecoFuncionalByServidorNomeContaining(
+            String nome, Pageable pageable) {
+        Page<Object[]> pageResult = servidorEfetivoRepository
+                .findEnderecoFuncionalByServidorNomeContaining(nome, pageable);
+        return pageResult.map(this::mapFindEnderecoFuncionalByServidorNomeContainingToDTO);
     }
 
-    public List<ConsultaEnderecoFuncionalServidorEfetivoPorNomeDTO> mapFindEnderecoFuncionalByServidorNomeContainingToDTO(
-            List<Object[]> result) {
-        List<ConsultaEnderecoFuncionalServidorEfetivoPorNomeDTO> dtos = new ArrayList<>();
-        for (Object[] row : result) {
-            ConsultaEnderecoFuncionalServidorEfetivoPorNomeDTO dto =
-                    new ConsultaEnderecoFuncionalServidorEfetivoPorNomeDTO();
-            dto.setPesId((Long) row[0]);
-            dto.setPesNome((String) row[1]);
-            dto.setUnidId((Long) row[2]);
-            dto.setUnidNome((String) row[3]);
-            dto.setUnidSigla((String) row[4]);
-            dto.setEndId((Long) row[5]);
-            dto.setEndTipoLogradouro((String) row[6]);
-            dto.setEndLogradouro((String) row[7]);
-            dto.setEndNumero((Integer) row[8]);
-            dto.setEndBairro((String) row[9]);
-            dto.setCidId((Long) row[10]);
-            dto.setCidNome((String) row[11]);
-            dto.setCidUf((String) row[12]);
-            dtos.add(dto);
-        }
-        return dtos;
+    public ConsultaEnderecoFuncionalServidorEfetivoPorNomeDTO mapFindEnderecoFuncionalByServidorNomeContainingToDTO(
+            Object[] row) {
+        ConsultaEnderecoFuncionalServidorEfetivoPorNomeDTO dto =
+                new ConsultaEnderecoFuncionalServidorEfetivoPorNomeDTO();
+        dto.setPesId((Long) row[0]);
+        dto.setPesNome((String) row[1]);
+        dto.setUnidId((Long) row[2]);
+        dto.setUnidNome((String) row[3]);
+        dto.setUnidSigla((String) row[4]);
+        dto.setEndId((Long) row[5]);
+        dto.setEndTipoLogradouro((String) row[6]);
+        dto.setEndLogradouro((String) row[7]);
+        dto.setEndNumero((Integer) row[8]);
+        dto.setEndBairro((String) row[9]);
+        dto.setCidId((Long) row[10]);
+        dto.setCidNome((String) row[11]);
+        dto.setCidUf((String) row[12]);
+        return dto;
     }
 }

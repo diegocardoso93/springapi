@@ -15,8 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -147,48 +145,49 @@ public class ServidorEfetivoController {
                 .ok(servidorEfetivoService.addEnderecoToServidorEfetivo(id, enderecoDTO));
     }
 
-    @Operation(summary = "Lista os servidores efetivos por ID da unidade",
-            description = "Retorna uma lista de servidores efetivos pertencentes a uma unidade específica.",
+    @Operation(summary = "Lista os servidores efetivos por ID da unidade com paginação",
+            description = "Retorna uma página de servidores efetivos pertencentes a uma unidade específica.",
             tags = {"Busca"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
-                    description = "Lista de servidores efetivos da unidade retornada com sucesso",
+                    description = "Página de servidores efetivos da unidade retornada com sucesso",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ServidorEfetivoDTO.class,
-                                    type = "array"))),
+                            schema = @Schema(
+                                    implementation = ConsultaServidorLotadoPorUnidadeDTO.class))),
             @ApiResponse(responseCode = "204",
-                    description = "Nenhum servidor efetivo encontrado para esta unidade",
+                    description = "Nenhum servidor efetivo encontrado para esta unidade nesta página",
                     content = @Content),
             @ApiResponse(responseCode = "404", description = "Unidade não encontrada",
                     content = @Content)})
     @GetMapping("/unidade/{unidadeId}")
-    public ResponseEntity<List<ConsultaServidorLotadoPorUnidadeDTO>> getServidoresEfetivosByUnidade(
+    public ResponseEntity<Page<ConsultaServidorLotadoPorUnidadeDTO>> getServidoresEfetivosByUnidade(
             @Parameter(description = "ID da unidade para buscar os servidores efetivos",
-                    required = true) @PathVariable Long unidadeId) {
-        List<ConsultaServidorLotadoPorUnidadeDTO> consulta =
-                servidorEfetivoService.findServidoresEfetivosLotadosPorUnidade(unidadeId);
+                    required = true) @PathVariable Long unidadeId,
+            Pageable pageable) {
+        Page<ConsultaServidorLotadoPorUnidadeDTO> consulta =
+                servidorEfetivoService.findServidoresEfetivosLotadosPorUnidade(unidadeId, pageable);
         return consulta.isEmpty() ? ResponseEntity.noContent().build()
                 : ResponseEntity.ok(consulta);
     }
 
     @Operation(
-            summary = "Consulta endereço funcional de servidores efetivos por nome (parcial ou completo)",
-            description = "Retorna uma lista de endereços de unidades de servidores efetivos cujo nome corresponde ao parâmetro de busca.",
+            summary = "Consulta paginada de endereço funcional de servidores efetivos por nome (parcial ou completo)",
+            description = "Retorna uma página de endereços de unidades de servidores efetivos cujo nome corresponde ao parâmetro de busca.",
             tags = {"Busca"})
     @ApiResponses(value = {@ApiResponse(responseCode = "200",
-            description = "Lista de endereços funcionais de servidores efetivos encontrados por nome retornada com sucesso",
+            description = "Página de endereços funcionais de servidores efetivos encontrados por nome retornada com sucesso",
             content = @Content(mediaType = "application/json", schema = @Schema(
-                    implementation = ConsultaEnderecoFuncionalServidorEfetivoPorNomeDTO.class,
-                    type = "array"))),
+                    implementation = ConsultaEnderecoFuncionalServidorEfetivoPorNomeDTO.class))),
             @ApiResponse(responseCode = "204",
-                    description = "Nenhum servidor efetivo encontrado com este nome",
+                    description = "Nenhum servidor efetivo encontrado com este nome nesta página",
                     content = @Content)})
     @GetMapping("/endereco-funcional")
-    public ResponseEntity<List<ConsultaEnderecoFuncionalServidorEfetivoPorNomeDTO>> getEnderecoFuncionalByServidorNomeContaining(
+    public ResponseEntity<Page<ConsultaEnderecoFuncionalServidorEfetivoPorNomeDTO>> getEnderecoFuncionalByServidorNomeContaining(
             @Parameter(description = "Nome (ou parte do nome) do servidor efetivo a ser buscado",
-                    required = true) @RequestParam("nome") String nome) {
-        List<ConsultaEnderecoFuncionalServidorEfetivoPorNomeDTO> servidores =
-                servidorEfetivoService.getEnderecoFuncionalByServidorNomeContaining(nome);
+                    required = true) @RequestParam("nome") String nome,
+            Pageable pageable) {
+        Page<ConsultaEnderecoFuncionalServidorEfetivoPorNomeDTO> servidores =
+                servidorEfetivoService.getEnderecoFuncionalByServidorNomeContaining(nome, pageable);
         return servidores.isEmpty() ? ResponseEntity.noContent().build()
                 : ResponseEntity.ok(servidores);
     }
