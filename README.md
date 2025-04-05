@@ -2,6 +2,11 @@
 
 Autor: Diego Cardoso  
 
+Fazer download da branch php:
+```
+git clone -b php https://github.com/diegocardoso93/springapi.git
+```
+
 Para rodar a aplicação:
 ```
 docker compose up -d --build
