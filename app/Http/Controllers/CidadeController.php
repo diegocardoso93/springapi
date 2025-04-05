@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Cidade;
 use App\Http\Resources\CidadeResource;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\ResourceCollection;
 
 /**
  * @OA\Schema(
@@ -28,6 +27,7 @@ class CidadeController extends Controller
      *      operationId="createCidade",
      *      tags={"Cidades"},
      *      summary="Cria uma nova cidade",
+     *      security={{"sanctum": {}}},
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(ref="#/components/schemas/Cidade")
@@ -40,7 +40,7 @@ class CidadeController extends Controller
      *      @OA\Response(response=400, description="Dados inválidos")
      * )
      */
-    public function create(Request $request)
+    public function store(Request $request)
     {
         $data = $request->validate([
             'cid_nome' => 'required|string',
@@ -48,7 +48,8 @@ class CidadeController extends Controller
         ]);
 
         $cidade = Cidade::create($data);
-        return new CidadeResource($cidade, 201);
+
+        return response()->json($cidade, 201);
     }
 
     /**
@@ -57,6 +58,7 @@ class CidadeController extends Controller
      *      operationId="getCidade",
      *      tags={"Cidades"},
      *      summary="Busca cidade por ID",
+     *      security={{"sanctum": {}}},
      *      @OA\Parameter(
      *          name="id",
      *          in="path",
@@ -79,6 +81,7 @@ class CidadeController extends Controller
      *      operationId="listCidades",
      *      tags={"Cidades"},
      *      summary="Lista todas as cidades",
+     *      security={{"sanctum": {}}},
      *      @OA\Response(response=200, description="Lista de cidades")
      * )
      */
@@ -95,6 +98,7 @@ class CidadeController extends Controller
      *      operationId="updateCidade",
      *      tags={"Cidades"},
      *      summary="Atualiza uma cidade",
+     *      security={{"sanctum": {}}},
      *      @OA\Parameter(
      *          name="id",
      *          in="path",
@@ -129,6 +133,7 @@ class CidadeController extends Controller
      *      operationId="deleteCidade",
      *      tags={"Cidades"},
      *      summary="Exclui uma cidade",
+     *      security={{"sanctum": {}}},
      *      @OA\Parameter(
      *          name="id",
      *          in="path",

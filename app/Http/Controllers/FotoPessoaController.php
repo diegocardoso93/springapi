@@ -22,6 +22,7 @@ class FotoPessoaController extends Controller
      *      operationId="uploadFotos",
      *      tags={"Fotos"},
      *      summary="Upload de múltiplas fotos",
+     *      security={{"sanctum": {}}},
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\MediaType(
@@ -51,25 +52,30 @@ class FotoPessoaController extends Controller
             'files.*' => 'required|image|max:10240',
             'pes_id' => 'required|exists:pessoa,pes_id'
         ]);
-
         $pessoa = Pessoa::findOrFail($request->pes_id);
         $uploadedFiles = [];
 
-        foreach ($request->file('files') as $file) {
-            $fileName = Str::uuid() . '-' . $file->getClientOriginalName();
-            $path = $file->storeAs('', $fileName, 'minio');
+        $file = $request->file('files');
 
-            $foto = FotoPessoa::create([
-                'fp_data' => now()->toDateString(),
-                'fp_bucket' => config('filesystems.disks.minio.bucket'),
-                'fp_hash' => $fileName,
-                'pes_id' => $pessoa->pes_id
-            ]);
+        $filename = Str::uuid() . '-' . $file->getClientOriginalName();
+        $path = $file->storeAs('', $filename, 'minio');
 
-            $uploadedFiles[] = $foto->fp_hash;
-        }
+        $foto = FotoPessoa::create([
+            'fp_data' => now()->toDateString(),
+            'fp_bucket' => config('filesystems.disks.minio.bucket'),
+            'fp_hash' => $filename,
+            'pes_id' => $pessoa->pes_id
+        ]);
+        $uploadedFiles[] = $foto->fp_hash;
 
         return response()->json($uploadedFiles, 201);
+    }
+
+    public function showUploadedImages(Request $request)
+    {
+        $imagesUrl = Storage::disk('minio')->allFiles('');
+        return response()->json(compact('imagesUrl'));
+        // return view('images', compact('imagesUrl'));
     }
 
     /**
@@ -78,6 +84,7 @@ class FotoPessoaController extends Controller
      *      operationId="getFotoLinks",
      *      tags={"Fotos"},
      *      summary="Lista links das fotos",
+     *      security={{"sanctum": {}}},
      *      @OA\Parameter(
      *          name="pesId",
      *          in="path",

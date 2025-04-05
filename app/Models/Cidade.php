@@ -14,4 +14,5 @@ class Cidade extends Model
         'cid_nome',
         'cid_uf'
     ];
+
 }

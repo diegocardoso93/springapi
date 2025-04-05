@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pessoa;
 use App\Models\ServidorTemporario;
 use App\Http\Resources\ServidorTemporarioResource;
 use App\Http\Requests\StoreServidorTemporarioRequest;
@@ -23,6 +24,7 @@ class ServidorTemporarioController extends Controller
      *     tags={"Servidores Temporários"},
      *     summary="Lista todos os servidores temporários com paginação",
      *     description="Retorna uma lista paginada de todos os servidores temporários.",
+     *     security={{"sanctum": {}}},
      *     @OA\Response(
      *         response=200,
      *         description="Lista de servidores temporários retornada com sucesso",
@@ -55,6 +57,7 @@ class ServidorTemporarioController extends Controller
      *     tags={"Servidores Temporários"},
      *     summary="Busca um servidor temporário por ID",
      *     description="Retorna os detalhes de um servidor temporário específico com base no seu ID.",
+     *     security={{"sanctum": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -85,6 +88,7 @@ class ServidorTemporarioController extends Controller
      *     tags={"Servidores Temporários"},
      *     summary="Cria um novo servidor temporário",
      *     description="Cria um novo registro de servidor temporário.",
+     *     security={{"sanctum": {}}},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(ref="#/components/schemas/StoreServidorTemporarioRequest")
@@ -128,6 +132,7 @@ class ServidorTemporarioController extends Controller
      *     tags={"Servidores Temporários"},
      *     summary="Atualiza um servidor temporário existente",
      *     description="Atualiza os dados de um servidor temporário específico com base no seu ID.",
+     *     security={{"sanctum": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -182,6 +187,7 @@ class ServidorTemporarioController extends Controller
      *     tags={"Servidores Temporários"},
      *     summary="Exclui um servidor temporário por ID",
      *     description="Remove um servidor temporário específico com base no seu ID.",
+     *     security={{"sanctum": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",

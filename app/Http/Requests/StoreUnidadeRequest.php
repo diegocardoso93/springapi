@@ -4,6 +4,21 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @OA\Schema(
+ *     schema="StoreUnidadeRequest",
+ *     type="object",
+ *     required={"unid_nome", "unid_sigla"},
+ *     @OA\Property(property="unid_nome", type="string", maxLength=255),
+ *     @OA\Property(property="unid_sigla", type="string", maxLength=50),
+ *     @OA\Property(
+ *         property="endereco_ids", 
+ *         type="array", 
+ *         @OA\Items(type="integer"),
+ *         nullable=true
+ *     )
+ * )
+ */
 class StoreUnidadeRequest extends FormRequest
 {
     public function authorize()

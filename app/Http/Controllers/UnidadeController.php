@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Endereco;
 use App\Models\Unidade;
 use App\Http\Resources\UnidadeResource;
 use App\Http\Requests\StoreUnidadeRequest;
@@ -24,6 +25,7 @@ class UnidadeController extends Controller
      *     tags={"Unidades"},
      *     summary="Lista todas as unidades com paginação",
      *     description="Retorna uma lista paginada de todas as unidades.",
+     *     security={{"sanctum": {}}},
      *     @OA\Response(
      *         response=200,
      *         description="Lista de unidades retornada com sucesso",
@@ -56,6 +58,7 @@ class UnidadeController extends Controller
      *     tags={"Unidades"},
      *     summary="Busca uma unidade por ID",
      *     description="Retorna os detalhes de uma unidade específica com base no seu ID.",
+     *     security={{"sanctum": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -86,6 +89,7 @@ class UnidadeController extends Controller
      *     tags={"Unidades"},
      *     summary="Cria uma nova unidade",
      *     description="Cria um novo registro de unidade.",
+     *     security={{"sanctum": {}}},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(ref="#/components/schemas/StoreUnidadeRequest")
@@ -120,6 +124,7 @@ class UnidadeController extends Controller
      *     tags={"Unidades"},
      *     summary="Atualiza uma unidade existente",
      *     description="Atualiza os dados de uma unidade específica com base no seu ID.",
+     *     security={{"sanctum": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -164,6 +169,7 @@ class UnidadeController extends Controller
      *     tags={"Unidades"},
      *     summary="Exclui uma unidade por ID",
      *     description="Remove uma unidade específica com base no seu ID.",
+     *     security={{"sanctum": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -195,6 +201,7 @@ class UnidadeController extends Controller
      *     tags={"Unidades", "Endereços"},
      *     summary="Adiciona um endereço a uma unidade existente",
      *     description="Adiciona um novo endereço à unidade especificada.",
+     *     security={{"sanctum": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",

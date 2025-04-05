@@ -4,6 +4,23 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @OA\Schema(
+ *     schema="UnidadeResource",
+ *     type="object",
+ *     @OA\Property(property="unid_id", type="integer"),
+ *     @OA\Property(property="unid_nome", type="string", maxLength=255),
+ *     @OA\Property(property="unid_sigla", type="string", maxLength=50),
+ *     @OA\Property(
+ *         property="enderecos",
+ *         type="array",
+ *         @OA\Items(
+ *             type="object",
+ *             @OA\Property(property="end_id", type="integer")
+ *         )
+ *     )
+ * )
+ */
 class UnidadeResource extends JsonResource
 {
     public function toArray($request)

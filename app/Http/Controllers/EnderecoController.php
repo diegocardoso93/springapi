@@ -30,6 +30,7 @@ class EnderecoController extends Controller
      *      operationId="getEndereco",
      *      tags={"Endereços"},
      *      summary="Busca endereço por ID",
+     *      security={{"sanctum": {}}},
      *      @OA\Parameter(
      *          name="id",
      *          in="path",
@@ -52,6 +53,7 @@ class EnderecoController extends Controller
      *      operationId="createEndereco",
      *      tags={"Endereços"},
      *      summary="Cria novo endereço",
+     *      security={{"sanctum": {}}},
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(ref="#/components/schemas/Endereco")
@@ -71,7 +73,7 @@ class EnderecoController extends Controller
         ]);
 
         $endereco = Endereco::create($data);
-        return new EnderecoResource($endereco, 201);
+        return new EnderecoResource($endereco);
     }
 
     /**
@@ -80,6 +82,7 @@ class EnderecoController extends Controller
      *      operationId="updateEndereco",
      *      tags={"Endereços"},
      *      summary="Atualiza endereço",
+     *      security={{"sanctum": {}}},
      *      @OA\Parameter(
      *          name="id",
      *          in="path",
@@ -117,6 +120,7 @@ class EnderecoController extends Controller
      *      operationId="deleteEndereco",
      *      tags={"Endereços"},
      *      summary="Exclui endereço",
+     *      security={{"sanctum": {}}},
      *      @OA\Parameter(
      *          name="id",
      *          in="path",

@@ -30,6 +30,7 @@ class LotacaoController extends Controller
      *      operationId="listLotacoes",
      *      tags={"Lotações"},
      *      summary="Listar todas as lotações",
+     *      security={{"sanctum": {}}},
      *      @OA\Response(
      *          response=200,
      *          description="Lista de lotações",
@@ -53,6 +54,7 @@ class LotacaoController extends Controller
      *      operationId="getLotacao",
      *      tags={"Lotações"},
      *      summary="Buscar lotação por ID",
+     *      security={{"sanctum": {}}},
      *      @OA\Parameter(
      *          name="id",
      *          in="path",
@@ -75,6 +77,7 @@ class LotacaoController extends Controller
      *      operationId="createLotacao",
      *      tags={"Lotações"},
      *      summary="Criar nova lotação",
+     *      security={{"sanctum": {}}},
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(ref="#/components/schemas/Lotacao")
@@ -94,7 +97,7 @@ class LotacaoController extends Controller
         ]);
 
         $lotacao = Lotacao::create($data);
-        return new LotacaoResource($lotacao, 201);
+        return new LotacaoResource($lotacao);
     }
 
     /**
@@ -103,6 +106,7 @@ class LotacaoController extends Controller
      *      operationId="updateLotacao",
      *      tags={"Lotações"},
      *      summary="Atualizar lotação",
+     *      security={{"sanctum": {}}},
      *      @OA\Parameter(
      *          name="id",
      *          in="path",
@@ -140,6 +144,7 @@ class LotacaoController extends Controller
      *      operationId="deleteLotacao",
      *      tags={"Lotações"},
      *      summary="Excluir lotação",
+     *      security={{"sanctum": {}}},
      *      @OA\Parameter(
      *          name="id",
      *          in="path",

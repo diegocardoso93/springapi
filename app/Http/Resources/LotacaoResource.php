@@ -4,6 +4,30 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @OA\Schema(
+ *     schema="LotacaoResource",
+ *     type="object",
+ *     @OA\Property(property="lot_id", type="integer"),
+ *     @OA\Property(property="lot_data_lotacao", type="string", format="date"),
+ *     @OA\Property(property="lot_data_remocao", type="string", format="date", nullable=true),
+ *     @OA\Property(property="lot_portaria", type="string", maxLength=255),
+ *     @OA\Property(property="pes_id", type="integer"),
+ *     @OA\Property(property="unid_id", type="integer"),
+ *     @OA\Property(
+ *         property="pessoa",
+ *         type="object",
+ *         @OA\Property(property="pes_id", type="integer"),
+ *         @OA\Property(property="pes_nome", type="string", maxLength=255)
+ *     ),
+ *     @OA\Property(
+ *         property="unidade",
+ *         type="object",
+ *         @OA\Property(property="unid_id", type="integer"),
+ *         @OA\Property(property="unid_nome", type="string", maxLength=255)
+ *     )
+ * )
+ */
 class LotacaoResource extends JsonResource
 {
     public function toArray($request)

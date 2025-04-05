@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Endereco;
+use App\Models\Pessoa;
 use App\Models\ServidorEfetivo;
 use App\Http\Resources\ServidorEfetivoResource;
 use App\Http\Resources\ConsultaServidorLotadoPorUnidadeResource;
@@ -9,6 +11,7 @@ use App\Http\Resources\ConsultaEnderecoFuncionalServidorEfetivoPorNomeResource;
 use App\Http\Requests\StoreServidorEfetivoRequest;
 use App\Http\Requests\UpdateServidorEfetivoRequest;
 use App\Http\Requests\AddEnderecoToServidorEfetivoRequest;
+use DB;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -20,6 +23,7 @@ class ServidorEfetivoController extends Controller
      *     tags={"Servidores Efetivos"},
      *     summary="Lista todos os servidores efetivos",
      *     description="Retorna uma lista paginada de todos os servidores efetivos.",
+     *     security={{"sanctum": {}}},
      *     @OA\Response(
      *         response=200,
      *         description="Lista de servidores efetivos retornada com sucesso",
@@ -52,6 +56,7 @@ class ServidorEfetivoController extends Controller
      *     tags={"Servidores Efetivos"},
      *     summary="Busca um servidor efetivo por ID",
      *     description="Retorna os detalhes de um servidor efetivo específico com base no seu ID.",
+     *     security={{"sanctum": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -82,6 +87,7 @@ class ServidorEfetivoController extends Controller
      *     tags={"Servidores Efetivos"},
      *     summary="Cria um novo servidor efetivo",
      *     description="Cria um novo registro de servidor efetivo.",
+     *     security={{"sanctum": {}}},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(ref="#/components/schemas/StoreServidorEfetivoRequest")
@@ -99,15 +105,30 @@ class ServidorEfetivoController extends Controller
      */
     public function store(StoreServidorEfetivoRequest $request)
     {
-        $servidor = ServidorEfetivo::create($request->validated());
-        
-        if ($request->has('endereco_ids')) {
-            $servidor->pessoa->enderecos()->sync($request->endereco_ids);
-        }
-        
-        return (new ServidorEfetivoResource($servidor))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
+        $validated = $request->validated();
+
+        $response = DB::transaction(function () use ($validated) {
+            $pessoa = Pessoa::create([
+                'pes_nome'             => $validated['pes_nome'],
+                'pes_data_nascimento'  => $validated['pes_data_nascimento'],
+                'pes_sexo'             => $validated['pes_sexo'],
+                'pes_mae'              => $validated['pes_mae'],
+                'pes_pai'              => $validated['pes_pai'],
+            ]);
+    
+            $servidor = ServidorEfetivo::create([
+                'pes_id'       => $pessoa->pes_id,
+                'se_matricula' => $validated['se_matricula'],
+            ]);
+    
+            if (!empty($validated['endereco_ids'])) {
+                $pessoa->enderecos()->sync($validated['endereco_ids']);
+            }
+    
+            return response()->json($servidor->load('pessoa.enderecos'), 201);
+        });
+
+        return $response;
     }
 
     /**
@@ -116,6 +137,7 @@ class ServidorEfetivoController extends Controller
      *     tags={"Servidores Efetivos"},
      *     summary="Atualiza um servidor efetivo existente",
      *     description="Atualiza os dados de um servidor efetivo específico com base no seu ID.",
+     *     security={{"sanctum": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -160,6 +182,7 @@ class ServidorEfetivoController extends Controller
      *     tags={"Servidores Efetivos"},
      *     summary="Exclui um servidor efetivo por ID",
      *     description="Remove um servidor efetivo específico com base no seu ID.",
+     *     security={{"sanctum": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -191,6 +214,7 @@ class ServidorEfetivoController extends Controller
      *     tags={"Servidores Efetivos", "Endereços"},
      *     summary="Adiciona um endereço a um servidor efetivo existente",
      *     description="Adiciona um novo endereço à servidor efetivo especificada.",
+     *     security={{"sanctum": {}}},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -221,9 +245,9 @@ class ServidorEfetivoController extends Controller
     {
         $servidor = ServidorEfetivo::findOrFail($id);
         $endereco = Endereco::create($request->validated());
-        
+
         $servidor->pessoa->enderecos()->attach($endereco->end_id);
-        
+
         return new ServidorEfetivoResource($servidor->load('pessoa.enderecos'));
     }
 
@@ -233,6 +257,7 @@ class ServidorEfetivoController extends Controller
      *     tags={"Busca"},
      *     summary="Lista os servidores efetivos por ID da unidade",
      *     description="Retorna uma lista de servidores efetivos pertencentes a uma unidade específica.",
+     *     security={{"sanctum": {}}},
      *     @OA\Parameter(
      *         name="unidadeId",
      *         in="path",
@@ -261,8 +286,8 @@ class ServidorEfetivoController extends Controller
     public function getByUnidade($unidadeId)
     {
         $servidores = ServidorEfetivo::whereHas('lotacoes', function($query) use ($unidadeId) {
-            $query->where('unidade_id', $unidadeId);
-        })->with(['pessoa', 'lotacoes.unidade'])->get();
+            $query->where('unid_id', $unidadeId);
+        })->with(['pessoa', 'lotacoes.unidade'])->paginate(10);
         
         if ($servidores->isEmpty()) {
             return response()->noContent();
@@ -277,6 +302,7 @@ class ServidorEfetivoController extends Controller
      *     tags={"Busca"},
      *     summary="Consulta endereço funcional de servidores efetivos por nome (parcial ou completo)",
      *     description="Retorna uma lista de endereços de unidades de servidores efetivos cujo nome corresponde ao parâmetro de busca.",
+     *     security={{"sanctum": {}}},
      *     @OA\Parameter(
      *         name="nome",
      *         in="query",
@@ -303,12 +329,12 @@ class ServidorEfetivoController extends Controller
         $nome = $request->query('nome');
         $servidores = ServidorEfetivo::whereHas('pessoa', function($query) use ($nome) {
             $query->where('pes_nome', 'like', "%{$nome}%");
-        })->with(['pessoa', 'lotacoes.unidade.endereco'])->get();
-        
+        })->with(['pessoa', 'lotacoes.unidade.enderecos'])->paginate(10);
+
         if ($servidores->isEmpty()) {
             return response()->noContent();
         }
-        
+
         return ConsultaEnderecoFuncionalServidorEfetivoPorNomeResource::collection($servidores);
     }
 }

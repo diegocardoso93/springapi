@@ -11,7 +11,7 @@ class ServidorEfetivoService
     public function findServidoresEfetivosLotadosPorUnidade($unidadeId)
     {
         return ServidorEfetivo::whereHas('lotacoes', function($query) use ($unidadeId) {
-            $query->where('unidade_id', $unidadeId);
+            $query->where('unid_id', $unidadeId);
         })->with(['pessoa', 'lotacoes.unidade'])->get();
     }
 
