@@ -10,9 +10,8 @@ git clone -b php https://github.com/diegocardoso93/springapi.git
 Para rodar a aplicação:
 ```
 docker compose up -d --build
-docker-compose exec app composer install
-docker-compose exec app chown -R www-data:www-data storage bootstrap/cache
-docker-compose exec app php artisan migrate
+docker compose exec app composer install
+docker compose exec app chown -R www-data:www-data storage bootstrap/cache
 ```
 
 Acessar a página: `http://localhost:8000/swagger-ui/index.html`  
