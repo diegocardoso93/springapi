@@ -14,8 +14,7 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
-    networks:
-      - laravel_network
+    network_mode: host
 
   # Nginx Web Server Service
   nginx:
@@ -29,8 +28,7 @@ services:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - app
-    networks:
-      - laravel_network
+    network_mode: host
 
   # PostgreSQL Database Service
   db:
@@ -46,16 +44,15 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - laravel_network
     healthcheck:
         test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
         interval: 10s
         timeout: 5s
         retries: 5
         start_period: 10s
+    network_mode: host
 
-  # MinIO S3 Compatible Storage Service
+# MinIO S3 Compatible Storage Service
   minio:
     image: minio/minio:latest
     container_name: laravel_minio
@@ -67,22 +64,44 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+      MINIO_API_PORT: ${MINIO_API_PORT}
     volumes:
       - minio_data:/data
-    command: server /data --console-address ":9001"
-    networks:
-      - laravel_network
+    command: server /data --address ":${MINIO_API_PORT:-9000}" --console-address ":${MINIO_CONSOLE_PORT:-9001}"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "curl", "-f", "${MINIO_ENDPOINT}/minio/health/ready"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
+    network_mode: host
 
-# Docker Networks
-networks:
-  laravel_network:
-    driver: bridge
+  # Service to create a Minio bucket on startup
+  create_minio_bucket:
+    build:
+      context: .
+      dockerfile: docker/minio_client/Dockerfile.minio_client
+    container_name: minio_bucket_creator
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+      MINIO_API_PORT: ${MINIO_API_PORT}
+    command: >
+      "while ! mc alias set local ${MINIO_ENDPOINT} ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY} --api S3v4 2>/dev/null; do
+      echo 'Aguardando MinIO ficar pronto...';
+      sleep 5;
+      done;
+      mc mb local/${MINIO_BUCKET_NAME};
+      mc policy set public local/${MINIO_BUCKET_NAME};
+      echo 'Bucket configurado com sucesso';"
+    network_mode: host
+
 
 # Docker Volumes (for data persistence)
 volumes:

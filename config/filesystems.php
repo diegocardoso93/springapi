@@ -52,10 +52,11 @@ return [
             'key' => env('MINIO_ACCESS_KEY'),
             'secret' => env('MINIO_SECRET_KEY'),
             'region' => 'us-east-1',
-            'bucket' => env('MINIO_BUCKET'),
-            'url' => env('MINIO_URL'),
+            'bucket' => env('MINIO_BUCKET_NAME'),
+            'url' => env('MINIO_ENDPOINT'),
             'endpoint' => env('MINIO_ENDPOINT'),
             'use_path_style_endpoint' => true,
+            'throw' => true,
         ],
     ],
 

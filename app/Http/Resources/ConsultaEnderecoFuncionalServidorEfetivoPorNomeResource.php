@@ -32,7 +32,7 @@ class ConsultaEnderecoFuncionalServidorEfetivoPorNomeResource extends JsonResour
     {
         $lotacao = $this->lotacoes->first();
         $unidade = $lotacao->unidade ?? new Unidade();
-        $endereco = $unidade->endereco ?? new Endereco();
+        $endereco = ($unidade->endereco ?? new Endereco())->first();
         $cidade = $endereco->cidade ?? new Cidade();
         
         return [

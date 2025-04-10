@@ -27,13 +27,13 @@ use App\Http\Controllers\UnidadeController; // Added
 // Public routes
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
-Route::post('refresh', [AuthController::class, 'refresh']);
 
 
 Route::get('show', [FotoPessoaController::class, 'showUploadedImages']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('refresh', [AuthController::class, 'refresh']);
 
     Route::prefix('/cidades')->group(function () {
         Route::get('/', [CidadeController::class, 'index']);

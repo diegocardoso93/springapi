@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Hash;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 /**
  * @OA\Info(
@@ -34,7 +32,7 @@ class AuthController extends Controller
      *     path="/api/register",
      *     tags={"Auth"},
      *     summary="Create API User",
-     *     description="Authenticates user using username and password and returns a JWT token.",
+     *     description="Authenticates user using username and password and returns a token.",
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -117,7 +115,7 @@ class AuthController extends Controller
         $credentials = $request->only('username', 'password');
         $user = User::firstWhere(['username' => $credentials['username']]);
 
-        if (! Hash::check($credentials['password'], $user->password)) {
+        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -138,24 +136,25 @@ class AuthController extends Controller
      *     path="/api/logout",
      *     tags={"Auth"},
      *     summary="Logout user",
-     *     description="Logs out the user and invalidates the JWT token.",
+     *     description="Logs out the user and invalidates the token.",
      *     security={{"sanctum":{}}},
      *     @OA\Response(response=200, description="Successfully logged out")
      * )
      */
     public function logout(Request $request)
     {
-        Auth::guard('jwt')->logout(); // Invalidate the token
+        // Revoga o token atual
+        $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json(['message' => 'Successfully logged out'], 200);
     }
 
     /**
      * @OA\Post(
      *     path="/api/refresh",
      *     tags={"Auth"},
-     *     summary="Refresh JWT token",
-     *     description="Refreshes the current JWT token and returns a new one.",
+     *     summary="Refresh access token",
+     *     description="Revokes the current token and returns a new one.",
      *     security={{"sanctum":{}}},
      *     @OA\Response(
      *         response=200,
@@ -167,32 +166,34 @@ class AuthController extends Controller
      *             @OA\Property(property="user", type="object")
      *         )
      *     ),
-     *     @OA\Response(response=401, description="Token is invalid"),
+     *     @OA\Response(response=401, description="Unauthorized"),
      *     @OA\Response(response=500, description="Could not refresh token")
      * )
      */
-    public function refresh()
+    public function refresh(Request $request)
     {
         try {
-            // Attempt to refresh the token using the 'jwt' guard
-            $newToken = Auth::guard('jwt')->refresh();
-             return $this->respondWithToken($newToken);
-        } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
-             return response()->json(['error' => 'Token is invalid'], 401);
-        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-             // This can happen if the token cannot be refreshed (e.g., refresh TTL expired)
-             return response()->json(['error' => 'Could not refresh token', 'details' => $e->getMessage()], 500);
-        }
-    }
+            $user = $request->user();
 
-    protected function respondWithToken($token)
-    {
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-             // Get token TTL from config (in minutes) and convert to seconds
-            'expires_in' => Auth::guard('jwt')->factory()->getTTL() * 60,
-            'user' => Auth::guard('jwt')->user() // Optionally return user info on login
-        ]);
+            // Revoga o token atual
+            $request->user()->currentAccessToken()->delete();
+
+            // Cria um novo token com expiração
+            $newToken = $user->createToken(
+                $user->username . now(),
+                ['*'],
+                now()->addMinutes(5) // 5 minutos como no login
+            );
+
+            return response()->json([
+                'access_token' => $newToken->plainTextToken,
+                'token_type' => 'bearer',
+                'expires_in' => 300, // 5 minutos em segundos
+                'user' => $user
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Could not refresh token', 'details' => $e->getMessage()], 500);
+        }
     }
 }

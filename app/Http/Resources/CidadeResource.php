@@ -9,9 +9,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @OA\Schema(
  *     schema="CidadeResource",
  *     type="object",
- *     @OA\Property(property="cidId", type="integer"),
- *     @OA\Property(property="cidNome", type="string", maxLength=255),
- *     @OA\Property(property="cidUf", type="string", maxLength=2)
+ *     @OA\Property(property="cid_id", type="integer"),
+ *     @OA\Property(property="cid_nome", type="string", maxLength=255),
+ *     @OA\Property(property="cid_uf", type="string", maxLength=2)
  * )
  */
 class CidadeResource extends JsonResource
@@ -19,9 +19,9 @@ class CidadeResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'cidId' => $this->cidId,
-            'cidNome' => $this->cidNome,
-            'cidUf' => $this->cidUf,
+            'cid_id' => $this->cid_id,
+            'cid_nome' => $this->cid_nome,
+            'cid_uf' => $this->cid_uf,
         ];
     }
 }

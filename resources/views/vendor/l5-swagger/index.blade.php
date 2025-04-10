@@ -135,6 +135,7 @@
         const ui = SwaggerUIBundle({
             dom_id: '#swagger-ui',
             urls: urls,
+            
             "urls.primaryName": "{{ $documentationTitle }}",
             operationsSorter: {!! isset($operationsSorter) ? '"' . $operationsSorter . '"' : 'null' !!},
             configUrl: {!! isset($configUrl) ? '"' . $configUrl . '"' : 'null' !!},
@@ -143,6 +144,8 @@
 
             requestInterceptor: function(request) {
                 request.headers['X-CSRF-TOKEN'] = '{{ csrf_token() }}';
+                request.headers['accept'] = 'application/json';
+                request.headers['Accept'] = '';
                 return request;
             },
 

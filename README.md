@@ -15,4 +15,4 @@ docker compose exec app chown -R www-data:www-data storage bootstrap/cache
 ```
 
 Acessar a página: `http://localhost:8000/swagger-ui/index.html`  
-Para testar sem problemas de CORS, colar o conteúdo do arquivo `endToEndTestScript.js` no console.
+Para testar sem problemas de CORS, colar o conteúdo inteiro do arquivo `endToEndTestScript.js` no console javascript.

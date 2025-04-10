@@ -1,0 +1,10 @@
+FROM alpine
+# Instala dependências necessárias para baixar o binário do mc e garantir a execução de HTTPS
+RUN apk add --no-cache wget ca-certificates
+
+# Baixa e instala o binário do minio client (mc)
+RUN wget https://dl.min.io/client/mc/release/linux-amd64/mc -O /usr/bin/mc && \
+    chmod +x /usr/bin/mc
+
+# Define o entrypoint para usar o shell
+ENTRYPOINT ["/bin/sh", "-c"]

@@ -5,6 +5,10 @@ window.onload = function() {
   window.ui = SwaggerUIBundle({
     url: "http://localhost:8000/api-docs.json",  // Ensure this matches where the JSON is available
     dom_id: '#swagger-ui',
+    requestInterceptor: function (request) {
+      request.headers['Accept'] = 'application/json';
+      return request;
+    },
     deepLinking: true,
     presets: [
         SwaggerUIBundle.presets.apis,
